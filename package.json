@@ -1,0 +1,32 @@
+{
+    "name": "box-game",
+    "version": "1.0.0",
+    "description": "Canvas 2D Box Game",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ishanjain28/box-game.git"
+    },
+    "keywords": [
+        "box",
+        "game",
+        "game",
+        "node",
+        "canvas",
+        "javascript"
+    ],
+    "author": "Ishan Jain <github.com/ishanjain28>",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/ishanjain28/box-game/issues"
+    },
+    "homepage": "https://github.com/ishanjain28/box-game#readme",
+    "devDependencies": {
+        "eslint": "^3.16.1"
+    },
+    "dependencies": {}
+}
