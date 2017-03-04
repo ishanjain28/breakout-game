@@ -19,7 +19,8 @@ var canvas = document.getElementById('breakout'),
     brickHeight = 20,
     brickPadding = 10,
     brickOffsetTop = 30,
-    brickOffsetLeft = 60;
+    brickOffsetLeft = 60,
+    score = 0;
 
 // Bricks Object
 var bricks = [];
@@ -77,6 +78,7 @@ function drawGameOver() {
     ctx.font = "60px serif";
     ctx.fillStyle = "red";
     ctx.fillText("Game Over!", (canvasWidth - 300) / 2, (canvasHeight - 60) / 2);
+    ctx.fillText('Score: ' + score, (canvasWidth - 200) / 2, (canvasHeight - 100 / 2));
 }
 
 function drawBricks() {
@@ -86,10 +88,9 @@ function drawBricks() {
             if (brick.status == 1) {
                 brick.x = (j * (brickWidth + brickPadding)) + brickOffsetLeft;
                 brick.y = (i * (brickHeight + brickPadding)) + brickOffsetTop;
-
                 // Draw the bricks
-                ctx.rect(brick.x, brick.y, brickWidth, brickHeight);
                 ctx.beginPath();
+                ctx.rect(brick.x, brick.y, brickWidth, brickHeight);
                 ctx.fillStyle = "#0095dd";
                 ctx.fill();
                 ctx.closePath();
@@ -104,15 +105,23 @@ function brickCollisionDetection() {
     for (var j = 0; j < brickColumnCount; j++) {
         for (var i = 0; i < brickRowCount; i++) {
             var brick = bricks[j][i];
-            if (ballInitialX > brick.x &&
+            if (brick.status == 1 &&
+                ballInitialX > brick.x &&
                 ballInitialX < brick.x + brickWidth &&
                 ballInitialY > brick.y &&
                 ballInitialY < brick.y + brickHeight) {
                 ballMovedy = -ballMovedy;
                 brick.status = 0;
+                score++;
             }
         }
     }
+}
+
+function drawScore() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "black";
+    ctx.fillText('Score: ' + score, 8, 20);
 }
 
 function draw() {
@@ -129,6 +138,8 @@ function draw() {
     drawBricks();
     // Enable Collision Detection b/w brick and ball
     brickCollisionDetection();
+    // Draws Score
+    drawScore();
     // For Left and Right edges
     if (ballInitialX + ballMovedx < ballRadius || ballInitialX + ballMovedx > canvasWidth - ballRadius) {
         ballMovedx = -ballMovedx;
