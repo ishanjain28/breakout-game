@@ -4,16 +4,16 @@ var canvas = document.getElementById('breakout'),
     canvasWidth = canvas.width,
     dMove = {
         ball: {
-            x: 2,
-            y: -2
+            x: generateRandomMovementVector().x,
+            y: generateRandomMovementVector().y
         },
         paddle: {
             x: 7
         }
     },
     ballProps = {
-        X: canvasWidth / 2,
-        Y: canvasHeight - 30,
+        X: Math.floor(Math.random() * (480 - 300) + 300),
+        Y: Math.floor(Math.random() * (480 - 300) + 300),
         radius: 10
     },
     paddleHeight = 10,
@@ -33,9 +33,16 @@ var canvas = document.getElementById('breakout'),
     },
     score = 0;
 
-// Save inital state
-ctx.save();
+function generateRandomMovementVector() {
+    var vector;
+    while (!(vector < -4) && !(vector > 4)) {
+        vector = Math.floor(Math.random() * (5 - (-5)) + (-5));
+    }
+    return { x: vector, y: -vector };
+}
 
+console.log(ballProps);
+console.log(dMove);
 // Bricks Object
 var bricks = [];
 
@@ -99,7 +106,7 @@ function drawGameOver() {
     ctx.fillText("Game Over!", (canvasWidth - 300) / 2, (canvasHeight - 60) / 2);
     ctx.fillText('Score: ' + score, (canvasWidth - 200) / 2, (canvasHeight - 100 / 2));
     ctx.font = "40px serif";
-    ctx.fillText("Restarting in 3 seconds!", (canvasWidth - 400) / 2, canvasHeight - 230);
+    ctx.fillText("Restarting in 2 seconds!", (canvasWidth - 400) / 2, canvasHeight - 230);
 }
 
 function drawBricks() {
@@ -145,12 +152,30 @@ function drawScore() {
     ctx.fillText('Score: ' + score, 8, 20);
 }
 
+function Congratulate() {
+    // Draws te Game Over Screen
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.font = "60px serif";
+    ctx.fillStyle = "green";
+    ctx.fillText("Congratulations!!", (canvasWidth - 450) / 2, (canvasHeight - 60) / 2);
+    ctx.fillText('Score: ' + score, (canvasWidth - 200) / 2, (canvasHeight - 100 / 2));
+    ctx.font = "40px serif";
+}
+
 function draw() {
+
+    /*
+     * Checks if player has reached 48 score
+     * If they have reached this score it means that player has blown all the bricks
+     * Game over, Congratulate player
+     */
+    if (score == (brickProps.columnCount * brickProps.rowCount)) {
+        Congratulate();
+    }
     /*
      * Clear the display before repaint
      * This way it doesn't leaves a trail of everything that moves
      */
-
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     // Draw Ball
     drawBall();
@@ -183,7 +208,7 @@ function draw() {
             drawGameOver();
             setTimeout(function() {
                 document.location.reload();
-            }, 3000);
+            }, 2000);
         }
     }
 
@@ -202,8 +227,6 @@ function draw() {
             draw();
         }
     });
-
-
 }
 
 window.requestAnimationFrame(function() {
