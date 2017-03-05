@@ -1,4 +1,4 @@
-var CACHE = 'v2:static';
+var CACHE = 'v333tatic';
 
 // On install, cache some resources.
 self.addEventListener('install', function(evt) {
