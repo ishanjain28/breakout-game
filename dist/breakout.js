@@ -31,12 +31,13 @@ var canvas = document.getElementById('breakout'),
         offsetTop: 30,
         offsetLeft: 60
     },
-    score = 0;
+    score = 0,
+    initialRender = 1;
 
 function generateRandomMovementVector() {
     var vector;
-    while (!(vector < -4) && !(vector > 4)) {
-        vector = Math.floor(Math.random() * (5 - (-5)) + (-5));
+    while (!(vector < -3) && !(vector > 3)) {
+        vector = Math.floor(Math.random() * (4 - (-4)) + (-4));
     }
     return { x: vector, y: -vector };
 }
@@ -170,6 +171,7 @@ function draw() {
      * Game over, Congratulate player
      */
     if (score == (brickProps.columnCount * brickProps.rowCount)) {
+        isGameOver = true;
         Congratulate();
     }
     /*
@@ -219,12 +221,18 @@ function draw() {
         paddleX -= dMove.paddle.x;
     }
 
-    //TODO: Variable Speed System
     ballProps.X += dMove.ball.x;
     ballProps.Y += dMove.ball.y;
+
     window.requestAnimationFrame(function() {
         if (!isGameOver) {
-            draw();
+            if (initialRender) {
+                initialRender = 0;
+                setTimeout(draw, 2000);
+            } else {
+                initialRender = 0;
+                draw();
+            }
         }
     });
 }
