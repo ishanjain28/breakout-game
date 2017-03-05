@@ -2,34 +2,53 @@ var canvas = document.getElementById('breakout'),
     ctx = canvas.getContext('2d'),
     canvasHeight = canvas.height,
     canvasWidth = canvas.width,
-    ballMovedx = 2,
-    ballMovedy = -2,
-    ballInitialX = canvas.width / 2,
-    ballInitialY = canvas.height - 30,
-    ballRadius = 10,
+    dMove = {
+        ball: {
+            x: 2,
+            y: -2
+        },
+        paddle: {
+            x: 7
+        }
+    },
+    ballProps = {
+        X: canvasWidth / 2,
+        Y: canvasHeight - 30,
+        radius: 10
+    },
     paddleHeight = 10,
     paddleWidth = 75,
     paddleX = (canvasWidth - paddleWidth) / 2,
     rightPressed = false,
     leftPressed = false,
     isGameOver = false,
-    brickRowCount = 6,
-    brickColumnCount = 8,
-    brickWidth = 75,
-    brickHeight = 20,
-    brickPadding = 10,
-    brickOffsetTop = 30,
-    brickOffsetLeft = 60,
+    brickProps = {
+        rowCount: 6,
+        columnCount: 8,
+        width: 75,
+        height: 20,
+        padding: 10,
+        offsetTop: 30,
+        offsetLeft: 60
+    },
     score = 0;
+
+// Save inital state
+ctx.save();
 
 // Bricks Object
 var bricks = [];
-for (var j = 0; j < brickColumnCount; j++) {
-    bricks[j] = [];
-    for (var i = 0; i < brickRowCount; i++) {
-        bricks[j][i] = { x: 0, y: 0, status: 1 };
+
+function makeBrickObject() {
+    for (var j = 0; j < brickProps.columnCount; j++) {
+        bricks[j] = [];
+        for (var i = 0; i < brickProps.rowCount; i++) {
+            bricks[j][i] = { x: 0, y: 0, status: 1 };
+        }
     }
 }
+
+makeBrickObject();
 
 // Register KeyUp/KeyDown listeners
 document.addEventListener('keyup', keyUpHandler, false);
@@ -57,7 +76,7 @@ function keyUpHandler(e) {
 function drawBall() {
     // Draws the ball
     ctx.beginPath();
-    ctx.arc(ballInitialX, ballInitialY, ballRadius, 0, Math.PI * 2);
+    ctx.arc(ballProps.X, ballProps.Y, ballProps.radius, 0, Math.PI * 2);
     ctx.fillStyle = "#0095dd";
     ctx.fill();
     ctx.closePath();
@@ -80,19 +99,19 @@ function drawGameOver() {
     ctx.fillText("Game Over!", (canvasWidth - 300) / 2, (canvasHeight - 60) / 2);
     ctx.fillText('Score: ' + score, (canvasWidth - 200) / 2, (canvasHeight - 100 / 2));
     ctx.font = "40px serif";
-    ctx.fillText("Restarting in 4 seconds!", (canvasWidth - 400) / 2, canvasHeight - 230);
+    ctx.fillText("Restarting in 3 seconds!", (canvasWidth - 400) / 2, canvasHeight - 230);
 }
 
 function drawBricks() {
-    for (var j = 0; j < brickColumnCount; j++) {
-        for (var i = 0; i < brickRowCount; i++) {
+    for (var j = 0; j < brickProps.columnCount; j++) {
+        for (var i = 0; i < brickProps.rowCount; i++) {
             var brick = bricks[j][i];
             if (brick.status == 1) {
-                brick.x = (j * (brickWidth + brickPadding)) + brickOffsetLeft;
-                brick.y = (i * (brickHeight + brickPadding)) + brickOffsetTop;
+                brick.x = (j * (brickProps.width + brickProps.padding)) + brickProps.offsetLeft;
+                brick.y = (i * (brickProps.height + brickProps.padding)) + brickProps.offsetTop;
                 // Draw the bricks
                 ctx.beginPath();
-                ctx.rect(brick.x, brick.y, brickWidth, brickHeight);
+                ctx.rect(brick.x, brick.y, brickProps.width, brickProps.height);
                 ctx.fillStyle = "#0095dd";
                 ctx.fill();
                 ctx.closePath();
@@ -104,15 +123,15 @@ function drawBricks() {
 
 function brickCollisionDetection() {
     // Collision detection b/w brick and ball
-    for (var j = 0; j < brickColumnCount; j++) {
-        for (var i = 0; i < brickRowCount; i++) {
+    for (var j = 0; j < brickProps.columnCount; j++) {
+        for (var i = 0; i < brickProps.rowCount; i++) {
             var brick = bricks[j][i];
             if (brick.status == 1 &&
-                ballInitialX > brick.x &&
-                ballInitialX < brick.x + brickWidth &&
-                ballInitialY > brick.y &&
-                ballInitialY < brick.y + brickHeight) {
-                ballMovedy = -ballMovedy;
+                ballProps.X > brick.x &&
+                ballProps.X < brick.x + brickProps.width &&
+                ballProps.Y > brick.y &&
+                ballProps.Y < brick.y + brickProps.height) {
+                dMove.ball.y = -dMove.ball.y;
                 brick.status = 0;
                 score++;
             }
@@ -131,6 +150,7 @@ function draw() {
      * Clear the display before repaint
      * This way it doesn't leaves a trail of everything that moves
      */
+
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     // Draw Ball
     drawBall();
@@ -142,43 +162,52 @@ function draw() {
     brickCollisionDetection();
     // Draws Score
     drawScore();
+
     // For Left and Right edges
-    if (ballInitialX + ballMovedx < ballRadius || ballInitialX + ballMovedx > canvasWidth - ballRadius) {
-        ballMovedx = -ballMovedx;
+    if (ballProps.X + dMove.ball.x < ballProps.radius || ballProps.X + dMove.ball.x > canvasWidth - ballProps.radius) {
+        dMove.ball.x = -dMove.ball.x;
     }
     // For Top Edge
-    if (ballInitialY + ballMovedy < ballRadius) {
-        ballMovedy = -ballMovedy;
-    } else if (ballInitialY + ballMovedy > canvasHeight - ballRadius) {
+    if (ballProps.Y + dMove.ball.y < ballProps.radius) {
+        dMove.ball.y = -dMove.ball.y;
+    } else if (ballProps.Y + dMove.ball.y > canvasHeight - ballProps.radius) {
         // Check if the ball's position on horizontal axis is falls inside
         // the paddle's position on X axis, If this is true, it means that ball
         // has hit the paddle, So we would want to rebound it now
         // If it is false, Then it means that ball is going to hit the bottom edges
         // Which means that someone just lose in the game.. :) 
-        if (ballInitialX > paddleX && ballInitialX < paddleX + paddleWidth) {
-            ballMovedy = -ballMovedy;
+        if (ballProps.X > paddleX && ballProps.X < paddleX + paddleWidth) {
+            dMove.ball.y = -dMove.ball.y;
         } else {
             isGameOver = true;
             drawGameOver();
             setTimeout(function() {
                 document.location.reload();
-            }, 4000);
+            }, 3000);
         }
     }
 
     if (rightPressed && paddleX < canvasWidth - paddleWidth) {
-        paddleX += 7;
+        paddleX += dMove.paddle.x;
     }
     if (leftPressed && paddleX > 0) {
-        paddleX -= 7;
+        paddleX -= dMove.paddle.x;
     }
-    ballInitialX += ballMovedx;
-    ballInitialY += ballMovedy;
+
+    //TODO: Variable Speed System
+    ballProps.X += dMove.ball.x;
+    ballProps.Y += dMove.ball.y;
+    window.requestAnimationFrame(function() {
+        if (!isGameOver) {
+            draw();
+        }
+    });
+
+
 }
 
-
-setInterval(function() {
+window.requestAnimationFrame(function() {
     if (!isGameOver) {
         draw();
     }
-}, 10);
+});
