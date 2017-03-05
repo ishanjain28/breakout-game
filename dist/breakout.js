@@ -99,16 +99,6 @@ function drawPaddle() {
     ctx.closePath();
 }
 
-function drawGameOver() {
-    // Draws te Game Over Screen
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    ctx.font = "60px serif";
-    ctx.fillStyle = "red";
-    ctx.fillText("Game Over!", (canvasWidth - 300) / 2, (canvasHeight - 60) / 2);
-    ctx.fillText('Score: ' + score, (canvasWidth - 200) / 2, (canvasHeight - 100 / 2));
-    ctx.font = "40px serif";
-    ctx.fillText("Restarting in 2 seconds!", (canvasWidth - 400) / 2, canvasHeight - 230);
-}
 
 function drawBricks() {
     for (var j = 0; j < brickProps.columnCount; j++) {
@@ -160,20 +150,21 @@ function Congratulate() {
     ctx.fillStyle = "green";
     ctx.fillText("Congratulations!!", (canvasWidth - 450) / 2, (canvasHeight - 60) / 2);
     ctx.fillText('Score: ' + score, (canvasWidth - 200) / 2, (canvasHeight - 100 / 2));
+}
+
+function drawGameOver() {
+    // Draws te Game Over Screen
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.font = "60px serif";
+    ctx.fillStyle = "red";
+    ctx.fillText("Game Over!", (canvasWidth - 300) / 2, (canvasHeight - 60) / 2);
+    ctx.fillText('Score: ' + score, (canvasWidth - 200) / 2, (canvasHeight - 100 / 2));
     ctx.font = "40px serif";
+    ctx.fillText("Restarting in 3 seconds!", (canvasWidth - 400) / 2, canvasHeight - 230);
 }
 
 function draw() {
 
-    /*
-     * Checks if player has reached 48 score
-     * If they have reached this score it means that player has blown all the bricks
-     * Game over, Congratulate player
-     */
-    if (score == (brickProps.columnCount * brickProps.rowCount)) {
-        isGameOver = true;
-        Congratulate();
-    }
     /*
      * Clear the display before repaint
      * This way it doesn't leaves a trail of everything that moves
@@ -210,15 +201,25 @@ function draw() {
             drawGameOver();
             setTimeout(function() {
                 document.location.reload();
-            }, 2000);
+            }, 3000);
         }
     }
 
     if (rightPressed && paddleX < canvasWidth - paddleWidth) {
         paddleX += dMove.paddle.x;
     }
+
     if (leftPressed && paddleX > 0) {
         paddleX -= dMove.paddle.x;
+    }
+    /*
+     * Checks if player has reached 48 score
+     * If they have reached this score it means that player has blown all the bricks
+     * Game over, Congratulate player
+     */
+    if (score == (brickProps.columnCount * brickProps.rowCount)) {
+        isGameOver = true;
+        Congratulate();
     }
 
     ballProps.X += dMove.ball.x;
@@ -227,13 +228,12 @@ function draw() {
     window.requestAnimationFrame(function() {
         if (!isGameOver) {
             if (initialRender) {
-                initialRender = 0;
                 setTimeout(draw, 2000);
             } else {
-                initialRender = 0;
                 draw();
             }
         }
+        initialRender = 0;
     });
 }
 
