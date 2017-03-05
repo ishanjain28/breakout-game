@@ -106,7 +106,7 @@ function drawGameOver() {
     ctx.fillText("Game Over!", (canvasWidth - 300) / 2, (canvasHeight - 60) / 2);
     ctx.fillText('Score: ' + score, (canvasWidth - 200) / 2, (canvasHeight - 100 / 2));
     ctx.font = "40px serif";
-    ctx.fillText("Restarting in 2 seconds!", (canvasWidth - 400) / 2, canvasHeight - 230);
+    ctx.fillText("Restarting in 4 seconds!", (canvasWidth - 400) / 2, canvasHeight - 230);
 }
 
 function drawBricks() {
@@ -208,7 +208,7 @@ function draw() {
             drawGameOver();
             setTimeout(function() {
                 document.location.reload();
-            }, 2000);
+            }, 4000);
         }
     }
 
